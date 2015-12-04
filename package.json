@@ -1,0 +1,19 @@
+{
+  "name": "happner-logger",
+  "version": "0.0.1",
+  "description": "Logger using log4js",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/happner/happner-logger.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/happner/happner-logger/issues"
+  },
+  "homepage": "https://github.com/happner/happner-logger#readme"
+}
