@@ -1,5 +1,5 @@
 {
-  "name": "happner-logger",
+  "name": "happn-logger",
   "version": "0.0.1",
   "description": "Logger using log4js",
   "main": "index.js",
@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/happner/happner-logger.git"
+    "url": "git+https://github.com/happner/happn-logger.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/happner/happner-logger/issues"
+    "url": "https://github.com/happner/happn-logger/issues"
   },
-  "homepage": "https://github.com/happner/happner-logger#readme"
+  "homepage": "https://github.com/happner/happn-logger#readme"
 }
