@@ -6,6 +6,7 @@ var LoggerInstance;
 describe('Logger', function() {
 
   beforeEach(function() {
+    delete global['happn-logger'];
     delete require.cache[require.resolve('../lib/logger')];
     delete require.cache[require.resolve('../')];
     delete require.cache[require.resolve('log4js')];

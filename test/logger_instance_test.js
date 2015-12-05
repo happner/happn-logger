@@ -103,11 +103,8 @@ describe('LoggerInstance', function() {
         }
       }, 'context', 'component');
       log.info('string: %s, number %s, json %j', 'STRING', 'NUMBER', {json: 'data'});
-    })
-
+    });
 
   });
-
-
 
 });
