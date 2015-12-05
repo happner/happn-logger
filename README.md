@@ -24,10 +24,21 @@ With component only.
 
 ```javascript
 var Logger = require('happn-logger');
-var log = context.createLogger('ComponentName');
+var log = Logger.createLogger('ComponentName');
 
 log.info('message');
 
 // [ INFO] - 1ms    (ComponentName) message
+```
+
+### Levels
+
+```javascript
+log.fatal('message');
+log.error('message');
+log.warn('message');
+log.info('message');
+log.debug('message');
+log.trace('message');
 ```
 
