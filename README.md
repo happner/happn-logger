@@ -37,13 +37,13 @@ log.info('message');
 
 ### Format string
 
-When logging it is best not to pre assemble the string to be logged because cost of doing so is incurred even when the level being logged-to is not enabled.
+When logging it is best not to pre-assemble the string to be logged because the cost of doing so is incurred even when the level being logged-to is not enabled.
 
 eg. `log.debug('number: ' + theNumber);`
 
 Instead, use a format string in the first argument. The logger will perform the string assembly internally __only if the log level is enabled__.
 
-eg. `log.debug('number: %d, string: %s, json: %j', theNumber, theString, theObject);
+eg. `log.debug('number: %d, string: %s, json: %j', theNumber, theString, theObject);`
 
 ### Levels
 
@@ -68,6 +68,8 @@ log.$$TRACE('message');
 This allows for confident matchability to enable substituting all debug and trace calls out of production deployments. 
 
 ### Configuration
+
+__It is important. The configure() must be called at least once.__
 
 Shown with default values below.
 
@@ -188,4 +190,21 @@ eg.
   ...
 ```
 
+
+### Events
+
+The logger emits an event before and after each log message. This enables console applications, terminals and similar to prepare for and/or recover from the logger performing a console write.
+
+eg.
+```javascript
+
+Logger.emitter.on('before', function() {
+  // Runs immediately before every log write.
+});
+
+Logger.emitter.on('after', function() {
+  // Runs immediately after every log write.
+});
+
+```
 

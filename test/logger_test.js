@@ -186,9 +186,6 @@ describe('Logger', function() {
 
       Logger.cache.should.eql([
         {
-          array: [
-            'F'
-          ],
           context: undefined,
           component: undefined,
           level: 'fatal',
@@ -197,9 +194,6 @@ describe('Logger', function() {
           timedelta: 1,
         },
         {
-          array: [
-            'E'
-          ],
           context: undefined,
           component: undefined,
           level: 'error',
@@ -208,9 +202,6 @@ describe('Logger', function() {
           timedelta: 1,
         },
         {
-          array: [
-            'D'
-          ],
           context: undefined,
           component: undefined,
           level: 'warn',
@@ -219,9 +210,6 @@ describe('Logger', function() {
           timedelta: 1,
         },
         {
-          array: [
-            'C'
-          ],
           context: undefined,
           component: undefined,
           level: 'info',
@@ -230,9 +218,6 @@ describe('Logger', function() {
           timedelta: 1,
         },
         {
-          array: [
-            'B'
-          ],
           context: undefined,
           component: undefined,
           level: 'debug',
