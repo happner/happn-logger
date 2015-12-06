@@ -35,6 +35,18 @@ log.info('message');
 // [ INFO] - 1ms    (ComponentName) message
 ```
 
+Creating log functions on existing object.
+
+```javascript
+var Logger = require('happn-logger');
+
+var thing = new Thing();
+Logger.createLogger('thing', thing);
+
+thing.info('message');
+// [ INFO] - 1ms    (thing) message
+```
+
 ### Context
 
 The context of the logger can be modified. The change is applied to all loggers in that context.
