@@ -134,6 +134,20 @@ describe('Logger', function() {
       log('message');
     });
 
+    it('can build log functions onto an object', function() {
+      var obj = {};
+      Logger.configure()
+      Logger.createLogger('component', obj);
+      obj.fatal   .should.be.an.instanceof(Function);
+      obj.error   .should.be.an.instanceof(Function);
+      obj.warn    .should.be.an.instanceof(Function);
+      obj.info    .should.be.an.instanceof(Function);
+      obj.debug   .should.be.an.instanceof(Function);
+      obj.$$DEBUG .should.be.an.instanceof(Function);
+      obj.trace   .should.be.an.instanceof(Function);
+      obj.$$TRACE .should.be.an.instanceof(Function);
+    });
+
   });
 
   context('logging to console', function() {
