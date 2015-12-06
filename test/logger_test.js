@@ -47,6 +47,7 @@ describe('Logger', function() {
           type: 'pattern'
         },
         logFile: null,
+        logFileLayout: null,
         logFileBackups: 10,
         logFileMaxSize: 20480,
         logFileNameAbsolute: true,

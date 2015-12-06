@@ -159,13 +159,13 @@ Limit disk resources used by log file. This specifies how big the log file is al
 
 It creates `.log` (the current log), `.log.1` (the previous log), `.log.2` (older), etc
 
-#### logFileNameAbsolute
-
-Specifies if the specified logFile is an "absolute" filename. Don't know why it matters. It's a log4js parameter.
-
 #### logFileLayout
 
 Same as logLayout above - but for the logFile not the console.
+
+#### logFileNameAbsolute
+
+Specifies if the specified logFile is an "absolute" filename. Don't know why it matters. It's a log4js parameter.
 
 #### logger
 
