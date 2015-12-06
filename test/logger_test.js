@@ -1,7 +1,6 @@
 var should = require('chai').should();
 var fs = require('fs');
 var Logger;
-var LoggerInstance;
 
 describe('Logger', function() {
 
@@ -11,7 +10,6 @@ describe('Logger', function() {
     delete require.cache[require.resolve('../')];
     delete require.cache[require.resolve('log4js')];
     Logger = require('../');
-    LoggerInstance = require('../lib/logger_instance');
     this.origNow = Date.now;
   });
 
@@ -28,19 +26,11 @@ describe('Logger', function() {
       Logger.configured.should.equal(false);
       Logger.configure();
       Logger.configured.should.equal(true);
-    })
-
-    it('configuration is passed to all new logger instances', function() {
-      Logger.configure({logLevel: 'fatal'});
-      var log = Logger.createLogger();
-      log.config.logLevel.should.equal('fatal');
-      log.should.be.an.instanceof(LoggerInstance);
     });
 
     it('defaults config', function() {
       Logger.configure();
-      var log = Logger.createLogger();
-      log.config.should.eql({
+      Logger.config.should.eql({
         logCacheSize: 50,
         logComponents: [],
         logLevel: 'info',
@@ -57,19 +47,91 @@ describe('Logger', function() {
         logFileBackups: 10,
         logFileMaxSize: 20480,
         logFileNameAbsolute: true,
-        logWriter: log.config.logWriter, // dodge object
+        logWriter: Logger.config.logWriter, // dodge object
         logger: {
           appenders: [{
             layout: {
               pattern: '[%[%5.5p%]] - %m',
               type: 'pattern'
             },
-            makers: log.config.logger.appenders[0].makers, // dodge object
+            makers: Logger.config.logger.appenders[0].makers, // dodge object
             type: 'console'
           }]
         },
-        log: log.config.log // dodge function
+        log: Logger.config.log // dodge function
       })
+    });
+
+  });
+
+  context('log functions', function(){
+
+    it('defines a function to emit a log message at each level', function() {
+      Logger.configure();
+      var log = Logger.createLogger();
+      log.fatal   .should.be.an.instanceof(Function);
+      log.error   .should.be.an.instanceof(Function);
+      log.warn    .should.be.an.instanceof(Function);
+      log.info    .should.be.an.instanceof(Function);
+      log.debug   .should.be.an.instanceof(Function);
+      log.$$DEBUG .should.be.an.instanceof(Function);
+      log.trace   .should.be.an.instanceof(Function);
+      log.$$TRACE .should.be.an.instanceof(Function);
+    });
+
+    it('calls the log function', function(done) {
+      Logger.configure();
+      log = Logger.createLogger();
+      Logger.config.log = function() {
+        done();
+      };
+      log.info('message');
+    });
+
+    it('tests of level is enabled before logging', function(done) {
+      Logger.configure();
+      var called = false;
+      var log = Logger.createLogger();
+      
+      Logger.config.logWriter.isInfoEnabled = done;
+      log.info('message');
+    });
+
+    it('formats the log text from multiple arguments', function(done) {
+      Logger.configure();
+      Logger.config.log = function(level, context, component, message) {
+        message.should.equal('string: STRING, number NUMBER, json {"json":"data"}');
+        done();
+      }
+      var log = Logger.createLogger();
+      log.info('string: %s, number %s, json %j', 'STRING', 'NUMBER', {json: 'data'});
+    });
+
+    it('includes the array of log arguments in log call if logStackTraces is enabled', function(done) {
+      Logger.configure({
+        logStackTraces: true,
+      });
+      Logger.config.log =  function(level, context, component, message, array) {
+        array.should.eql([
+          'string: %s, number %s, json %j',
+          'STRING',
+          'NUMBER',
+          {json: 'data'}
+        ]);
+        done();
+      }
+      var log = Logger.createLogger();
+      log.info('string: %s, number %s, json %j', 'STRING', 'NUMBER', {json: 'data'});
+    });
+
+    it('default log to debug', function() {
+      Logger.configure();
+      var log = Logger.createLogger();
+      Logger.config.log = function(level) {
+        level.should.equal('debug');
+        done();
+      }
+      log('message');
     });
 
   });
