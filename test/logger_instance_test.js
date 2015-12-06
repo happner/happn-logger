@@ -8,14 +8,6 @@ describe('LoggerInstance', function() {
     LoggerInstance = require('../lib/logger_instance');
   });
 
-
-  it('has config, context and component properties', function() {
-    var loggerInstance = new LoggerInstance('CONFIG', 'CONTEXT', 'COMPONENT');
-    loggerInstance.config.should.equal('CONFIG');
-    loggerInstance.context.should.equal('CONTEXT');
-    loggerInstance.component.should.equal('COMPONENT');
-  });
-
   context('log functions', function(){
 
     it('defines a function to emit a log message at each level', function() {
@@ -44,7 +36,7 @@ describe('LoggerInstance', function() {
           message.should.equal('message');
           done();
         }
-      }, 'context', 'component');
+      }, {value:'context'}, 'component');
 
       log.info('message');
     });
@@ -121,7 +113,7 @@ describe('LoggerInstance', function() {
         contexts.push(context);
         components.push(component);
       }
-    }, 'context', 'component');
+    }, {value: 'context'}, 'component');
 
     log.info('one');
     log2 = log.createLogger('component2');

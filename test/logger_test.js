@@ -116,6 +116,55 @@ describe('Logger', function() {
 
   });
 
+  context('context', function() {
+
+    it('can change the context', function(done) {
+
+      Logger.configure({
+        logFile: 'file.log',
+        logFileLayout: {
+          type: 'pattern',
+          pattern: '%m'
+        },
+        logTimeDelta: false,
+        logMessageDelimiter: ' '
+
+      });
+
+      var context = Logger.createContext();
+
+      var log1 = context.createLogger('component1');
+      var log2 = context.createLogger('component2');
+
+      var log3 = log1.createLogger('component3');
+
+      log1.info('message 1');
+      log2.info('message 2');
+      log3.info('message 3');
+      
+      context.context = 'xxx';
+
+      log1.info('message 1');
+      log2.info('message 2');
+      log3.info('message 3');
+
+      log2.context = 'yyy';
+
+      log1.info('message 1');
+      log2.info('message 2');
+      log3.info('message 3');
+
+      setTimeout(function() {
+        var logged = fs.readFileSync('file.log').toString();
+        logged.should.equal('(component1) message 1\n(component2) message 2\n(component3) message 3\nxxx (component1) message 1\nxxx (component2) message 2\nxxx (component3) message 3\nyyy (component1) message 1\nyyy (component2) message 2\nyyy (component3) message 3\n');
+        fs.unlinkSync('file.log');
+        done();
+      }, 100);
+
+    });
+
+  });
+
   context('emitter', function() {
 
     it('emits an event before writing to log', function() {

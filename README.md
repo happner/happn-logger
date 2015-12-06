@@ -35,6 +35,39 @@ log.info('message');
 // [ INFO] - 1ms    (ComponentName) message
 ```
 
+### Context
+
+The context of the logger can be modified. The change is applied to all loggers in that context.
+
+```javascript
+var Logger = require('happn-logger');
+var logContext = Logger.createContext('ContextName');
+var log1 = logContext.createLogger('ComponentName1');
+var log2 = logContext.createLogger('ComponentName2');
+
+log1.info('message');
+log2.info('message');
+// [ INFO] - 0ms    ContextName (ComponentName1) message
+// [ INFO] - 0ms    ContextName (ComponentName2) message
+
+logContext.context = 'Renamed';
+log1.info('message');
+log2.info('message');
+// [ INFO] - 0ms    Renamed (ComponentName1) message
+// [ INFO] - 0ms    Renamed (ComponentName2) message
+```
+
+The context can be renamed from any one of the loggers and it will apply to all in the context.
+
+```javascript
+log1.context('RenamedAgain');
+
+log1.info('message');
+log2.info('message');
+// [ INFO] - 0ms    RenamedAgain (ComponentName1) message
+// [ INFO] - 0ms    RenamedAgain (ComponentName2) message
+```
+
 ### Format string
 
 When logging it is best not to pre-assemble the string to be logged because the cost of doing so is incurred even when the level being logged-to is not enabled.
