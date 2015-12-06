@@ -24,6 +24,12 @@ describe('Logger', function() {
 
   context('configuration', function() {
 
+    it('sets the configured flag', function() {
+      Logger.configured.should.equal(false);
+      Logger.configure();
+      Logger.configured.should.equal(true);
+    })
+
     it('configuration is passed to all new logger instances', function() {
       Logger.configure({logLevel: 'fatal'});
       var log = Logger.createLogger();
