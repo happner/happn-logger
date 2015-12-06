@@ -107,4 +107,29 @@ describe('LoggerInstance', function() {
 
   });
 
+  it('can create anoter component logger in the same context', function() {
+    var contexts = [];
+    var components = [];
+    var log = new LoggerInstance({
+      logStackTraces: true,
+      logWriter: {
+        isInfoEnabled: function() {
+          return true;
+        }
+      },
+      log: function(level, context, component, message, array) {
+        contexts.push(context);
+        components.push(component);
+      }
+    }, 'context', 'component');
+
+    log.info('one');
+    log2 = log.createLogger('component2');
+    log2.info('one');
+
+    contexts.should.eql(['context', 'context']);
+    components.should.eql(['component', 'component2']);
+
+  })
+
 });

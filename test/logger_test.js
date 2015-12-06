@@ -185,39 +185,59 @@ describe('Logger', function() {
 
       Logger.cache.should.eql([
         {
+          array: [
+            'F'
+          ],
           context: undefined,
           component: undefined,
           level: 'fatal',
           message: 'F',
-          timestamp: 5
+          timestamp: 5,
+          timedelta: 1,
         },
         {
+          array: [
+            'E'
+          ],
           context: undefined,
           component: undefined,
           level: 'error',
           message: 'E',
-          timestamp: 4
+          timestamp: 4,
+          timedelta: 1,
         },
         {
+          array: [
+            'D'
+          ],
           context: undefined,
           component: undefined,
           level: 'warn',
           message: 'D',
-          timestamp: 3
+          timestamp: 3,
+          timedelta: 1,
         },
         {
+          array: [
+            'C'
+          ],
           context: undefined,
           component: undefined,
           level: 'info',
           message: 'C',
-          timestamp: 2
+          timestamp: 2,
+          timedelta: 1,
         },
         {
+          array: [
+            'B'
+          ],
           context: undefined,
           component: undefined,
           level: 'debug',
           message: 'B',
-          timestamp: 1
+          timestamp: 1,
+          timedelta: 1,
         },
         
       ])
