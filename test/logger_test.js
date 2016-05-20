@@ -426,6 +426,7 @@ describe('Logger', function() {
   context('logger subconfig', function() {
 
     it('allows for entirely externally defined log4js config', function(done) {
+
       Logger.configure({
         logMessageDelimiter: ' ',
         logTimeDelta: false,
@@ -451,6 +452,40 @@ describe('Logger', function() {
         done();
       }, 100);
 
+
+    });
+
+  });
+
+  context('logger after event', function() {
+
+    this.timeout(5000);
+
+    it('allows for a listener to be inserted, checks the listener receives all input', function(done) {
+
+      var listened = {};
+
+      Logger.emitter.on('after', function(level, message) {
+
+        listened[level] = message;
+        if (Object.keys(listened).length == 3){
+
+          listened['info'].split('\t')[1].should.equal('INFO-TEST');
+          listened['warn'].split('\t')[1].should.equal('WARN-TEST');
+          listened['error'].split('\t')[1].should.equal('ERROR-TEST');
+
+          done();
+        }
+
+      });
+
+      Logger.configure({logLevel: 'info'});
+
+      var log = Logger.createLogger();
+
+      log.info('INFO-TEST');
+      log.warn('WARN-TEST');
+      log.error('ERROR-TEST');
 
     });
 

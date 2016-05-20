@@ -251,5 +251,13 @@ Logger.emitter.on('after', function() {
   // Runs immediately after every log write.
 });
 
+//you can also listen for the actual log message and level
+Logger.emitter.on('after', function(level, message) {
+
+  //level = info|error|warn|debug
+  //message = 1ms<tab>hello
+
+});
+
 ```
 
