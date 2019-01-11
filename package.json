@@ -1,6 +1,6 @@
 {
   "name": "happn-logger",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Logger using log4js",
   "main": "index.js",
   "scripts": {
@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/happner/happn-logger#readme",
   "devDependencies": {
-    "chai": "^3.4.1",
-    "mocha": "^2.3.4"
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
   },
   "dependencies": {
-    "log4js": "^0.6.29"
+    "log4js": "^3.0.6"
   }
 }
