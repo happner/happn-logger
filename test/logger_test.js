@@ -92,7 +92,7 @@ describe('Logger', function() {
       Logger.configure();
       var called = false;
       var log = Logger.createLogger();
-      
+
       Logger.config.logWriter.isInfoEnabled = done;
       log.info('message');
     });
@@ -196,6 +196,40 @@ describe('Logger', function() {
       }, 100);
     });
 
+    it('includes the line number and filename of the caller if we log an error without an error object', function(done) {
+      try {
+        fs.unlinkSync('file.log');
+      } catch (e) {}
+      Logger.configure({
+        logFile: 'file.log'
+      });
+      var log = Logger.createLogger('component');
+      log.error('xxxxx');
+      setTimeout(function() {
+        var logged = fs.readFileSync('file.log').toString();
+        logged.should.match(/ \[ERROR\] - file path:/);
+        fs.unlinkSync('file.log');
+        done();
+      }, 100);
+    });
+
+    it('includes the line number and filename of the caller if we log an error with an error object', function(done) {
+      try {
+        fs.unlinkSync('file.log');
+      } catch (e) {}
+      Logger.configure({
+        logFile: 'file.log'
+      });
+      var log = Logger.createLogger('component');
+      log.error('xxxxx', new Error('test error'));
+      setTimeout(function() {
+        var logged = fs.readFileSync('file.log').toString();
+        console.log('logged:::', logged);
+        logged.should.match(/ \[ERROR\] - file path:/);
+        fs.unlinkSync('file.log');
+        done();
+      }, 100);
+    });
   });
 
   context('context', function() {
@@ -223,7 +257,7 @@ describe('Logger', function() {
       log1.info('message 1');
       log2.info('message 2');
       log3.info('message 3');
-      
+
       context.context = 'xxx';
 
       log1.info('message 1');
@@ -356,7 +390,7 @@ describe('Logger', function() {
           timestamp: 1,
           timedelta: 1,
         },
-        
+
       ])
 
     });
@@ -378,7 +412,7 @@ describe('Logger', function() {
       var component1 = Logger.createLogger('component1');
       var component2 = Logger.createLogger('component2');
       var component3 = Logger.createLogger('component3');
-      
+
       component1.info('aaaaa');
       component2.info('bbbbb');
       component3.info('ccccc');
@@ -406,7 +440,7 @@ describe('Logger', function() {
       var component2 = Logger.createLogger('component2');
       var component3 = Logger.createLogger('component3');
       var component4 = Logger.createLogger('component4');
-      
+
       component2.fatal('aaaaa');
       component3.error('bbbbb');
       component4.warn('ccccc');
