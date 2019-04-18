@@ -207,7 +207,7 @@ describe('Logger', function() {
       log.error('xxxxx');
       setTimeout(function() {
         var logged = fs.readFileSync('file.log').toString();
-        logged.should.match(/ \[ERROR\] - file path:/);
+        logged.should.match(/happn-logger\/test\/logger_test.js/);
         fs.unlinkSync('file.log');
         done();
       }, 100);
@@ -224,8 +224,7 @@ describe('Logger', function() {
       log.error('xxxxx', new Error('test error'));
       setTimeout(function() {
         var logged = fs.readFileSync('file.log').toString();
-        console.log('logged:::', logged);
-        logged.should.match(/ \[ERROR\] - file path:/);
+        logged.should.match(/happn-logger\/test\/logger_test.js/);
         fs.unlinkSync('file.log');
         done();
       }, 100);
