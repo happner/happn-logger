@@ -39,7 +39,7 @@ describe('Logger', function() {
         logTimeDelta: true,
         logDateFormat: null,
         logLayout: {
-          pattern: '[%[%5.5p%]] - %m',
+          'pattern': '%d{yyyy-MM-dd hh:mm:ss.SSS} [%5.5p] - %m',
           type: 'pattern'
         },
         logFile: null,
@@ -51,7 +51,7 @@ describe('Logger', function() {
         logger: {
           appenders: [{
             layout: {
-              pattern: '[%[%5.5p%]] - %m',
+              'pattern': '%d{yyyy-MM-dd hh:mm:ss.SSS} [%5.5p] - %m',
               type: 'pattern'
             },
             makers: Logger.config.logger.appenders[0].makers, // dodge object
@@ -503,9 +503,14 @@ describe('Logger', function() {
         listened[level] = message;
         if (Object.keys(listened).length == 3){
 
-          listened['info'].split('\t')[1].should.equal('INFO-TEST');
-          listened['warn'].split('\t')[1].should.equal('WARN-TEST');
-          listened['error'].split('\t')[1].should.equal('ERROR-TEST');
+          listened['info'].split('ms ')[1].should.equal('INFO-TEST');
+          listened['warn'].split('ms ')[1].should.equal('WARN-TEST');
+          listened['error'].split('ms ')[1].should.equal('ERROR-TEST');
+
+          // check ms padding
+          listened['info'].split('ms ')[0].length.should.equal(5);
+          listened['warn'].split('ms ')[0].length.should.equal(5);
+          listened['error'].split('ms ')[0].length.should.equal(5);
 
           done();
         }
