@@ -39,7 +39,7 @@ describe('Logger', function() {
         logTimeDelta: true,
         logDateFormat: null,
         logLayout: {
-          'pattern': '%d{yyyy-MM-dd hh:mm:ss.SSS} [%5.5p] - %m',
+          pattern: '[%[%5.5p%]] - %m',
           type: 'pattern'
         },
         logFile: null,
@@ -51,7 +51,7 @@ describe('Logger', function() {
         logger: {
           appenders: [{
             layout: {
-              'pattern': '%d{yyyy-MM-dd hh:mm:ss.SSS} [%5.5p] - %m',
+              pattern: '[%[%5.5p%]] - %m',
               type: 'pattern'
             },
             makers: Logger.config.logger.appenders[0].makers, // dodge object
