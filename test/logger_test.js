@@ -612,6 +612,38 @@ describe('Logger', function() {
       ]);
     });
 
+    it('calls the log raw functions - non-objects', function() {
+      Logger.configure({logLevel: 'trace'});
+      log = Logger.createLogger();
+      const CaptureStdout = require('capture-stdout');
+      const captureStdout = new CaptureStdout();
+      captureStdout.startCapture();
+      log.raw['fatal'](new Error('a fatal error!'));
+      log.raw['info'](null);
+      log.raw['error'](undefined);
+      log.raw['debug'](12345);
+      log.raw['warn']('warning!');
+      const circularObj = {};
+      circularObj.me = circularObj;
+      log.raw['trace'](circularObj);
+      captureStdout.stopCapture();
+      const arrJson = captureStdout
+        .getCapturedText()
+        .map(JSON.parse)
+        .map(item => {
+          delete item.timestamp;
+          return item;
+        });
+      arrJson.should.eql([
+        {"level":"fatal","data": "Error: a fatal error!"},
+        {"level":"info","data":"[null]"},
+        {"level":"error","data":"[null]"},
+        {"level":"debug","data":12345},
+        {"level":"warn","data":'warning!'},
+        {"level":"trace","data":'not stringifyable: [object Object]'}
+      ]);
+    });
+
     function testLogWriterRaw(level, obj, done){
       Logger.configure({logLevel: 'trace'});
       log = Logger.createLogger();
