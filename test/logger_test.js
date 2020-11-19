@@ -550,36 +550,36 @@ describe('Logger', function() {
     it('defines a function to emit a log message at each level for raw logs', function() {
       Logger.configure({logLevel: 'debug'});
       var log = Logger.createLogger();
-      log.raw.fatal   .should.be.an.instanceof(Function);
-      log.raw.error   .should.be.an.instanceof(Function);
-      log.raw.warn    .should.be.an.instanceof(Function);
-      log.raw.info    .should.be.an.instanceof(Function);
-      log.raw.debug   .should.be.an.instanceof(Function);
-      log.raw.trace   .should.be.an.instanceof(Function);
+      log.json.fatal   .should.be.an.instanceof(Function);
+      log.json.error   .should.be.an.instanceof(Function);
+      log.json.warn    .should.be.an.instanceof(Function);
+      log.json.info    .should.be.an.instanceof(Function);
+      log.json.debug   .should.be.an.instanceof(Function);
+      log.json.trace   .should.be.an.instanceof(Function);
     });
 
     it('calls the log raw function - fatal', function(done) {
-      testLogWriterRaw('fatal', { test: 'data'}, done);
+      testLogWriterRaw('fatal', { test: 'data'}, 'tag-1', done);
     });
 
     it('calls the log raw function - info', function(done) {
-      testLogWriterRaw('info', { test: 'data'}, done);
+      testLogWriterRaw('info', { test: 'data'}, 'tag-2', done);
     });
 
     it('calls the log raw function - error', function(done) {
-      testLogWriterRaw('error', { test: 'data'}, done);
+      testLogWriterRaw('error', { test: 'data'}, 'tag-3', done);
     });
 
     it('calls the log raw function - debug', function(done) {
-      testLogWriterRaw('debug', { test: 'data'}, done);
+      testLogWriterRaw('debug', { test: 'data'}, 'tag-4', done);
     });
 
     it('calls the log raw function - warn', function(done) {
-      testLogWriterRaw('warn', { test: 'data'}, done);
+      testLogWriterRaw('warn', { test: 'data'}, 'tag-5', done);
     });
 
     it('calls the log raw function - trace', function(done) {
-      testLogWriterRaw('trace', { test: 'data'}, done);
+      testLogWriterRaw('trace', { test: 'data'}, 'tag-6', done);
     });
 
     it('calls the log raw functions', function() {
@@ -588,12 +588,12 @@ describe('Logger', function() {
       const CaptureStdout = require('capture-stdout');
       const captureStdout = new CaptureStdout();
       captureStdout.startCapture();
-      log.raw['fatal']({ test: 'fatal' });
-      log.raw['info']({ test: 'info' });
-      log.raw['error']({ test: 'error' });
-      log.raw['debug']({ test: 'debug' });
-      log.raw['warn']({ test: 'warn' });
-      log.raw['trace']({ test: 'trace' });
+      log.json['fatal']({ test: 'fatal' });
+      log.json['info']({ test: 'info' });
+      log.json['error']({ test: 'error' });
+      log.json['debug']({ test: 'debug' });
+      log.json['warn']({ test: 'warn' });
+      log.json['trace']({ test: 'trace' });
       captureStdout.stopCapture();
       const arrJson = captureStdout
         .getCapturedText()
@@ -603,12 +603,12 @@ describe('Logger', function() {
           return item;
         });
       arrJson.should.eql([
-        {"level":"fatal","data":{"test":"fatal"}},
-        {"level":"info","data":{"test":"info"}},
-        {"level":"error","data":{"test":"error"}},
-        {"level":"debug","data":{"test":"debug"}},
-        {"level":"warn","data":{"test":"warn"}},
-        {"level":"trace","data":{"test":"trace"}}
+        {"level":"fatal", "data":{"test":"fatal"}},
+        {"level":"info", "data":{"test":"info"}},
+        {"level":"error", "data":{"test":"error"}},
+        {"level":"debug", "data":{"test":"debug"}},
+        {"level":"warn", "data":{"test":"warn"}},
+        {"level":"trace", "data":{"test":"trace"}}
       ]);
     });
 
@@ -618,14 +618,14 @@ describe('Logger', function() {
       const CaptureStdout = require('capture-stdout');
       const captureStdout = new CaptureStdout();
       captureStdout.startCapture();
-      log.raw['fatal'](new Error('a fatal error!'));
-      log.raw['info'](null);
-      log.raw['error'](undefined);
-      log.raw['debug'](12345);
-      log.raw['warn']('warning!');
+      log.json['fatal'](new Error('a fatal error!'));
+      log.json['info'](null);
+      log.json['error'](undefined);
+      log.json['debug'](12345);
+      log.json['warn']('warning!');
       const circularObj = {};
       circularObj.me = circularObj;
-      log.raw['trace'](circularObj);
+      log.json['trace'](circularObj);
       captureStdout.stopCapture();
       const arrJson = captureStdout
         .getCapturedText()
@@ -644,7 +644,7 @@ describe('Logger', function() {
       ]);
     });
 
-    function testLogWriterRaw(level, obj, done){
+    function testLogWriterRaw(level, obj, tag, done){
       Logger.configure({logLevel: 'trace'});
       log = Logger.createLogger();
       Logger.config.rawLogWriter[level] = function(stringifiedObj) {
@@ -653,11 +653,12 @@ describe('Logger', function() {
         delete parsed.timestamp;
         parsed.should.eql({
           data: obj,
-          level
+          level,
+          tag
         });
         done();
       }
-      log.raw[level](obj);
+      log.json[level](obj, tag);
     }
   });
 });
