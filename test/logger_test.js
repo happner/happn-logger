@@ -644,6 +644,34 @@ describe('Logger', function() {
       ]);
     });
 
+    it('tests the setLevel function', function() {
+      Logger.configure({logLevel: 'off'});
+      log = Logger.createLogger();
+      const CaptureStdout = require('capture-stdout');
+      const captureStdout = new CaptureStdout();
+      captureStdout.startCapture();
+      log.json['fatal']({ test: 'fatal' });
+      log.json['info']({ test: 'info' });
+      log.json['error']({ test: 'error' });
+      log.setLevel('trace');
+      log.json['debug']({ test: 'debug' });
+      log.json['warn']({ test: 'warn' });
+      log.json['trace']({ test: 'trace' });
+      captureStdout.stopCapture();
+      const arrJson = captureStdout
+        .getCapturedText()
+        .map(JSON.parse)
+        .map(item => {
+          delete item.timestamp;
+          return item;
+        });
+      arrJson.should.eql([
+        {"level":"debug", "data":{"test":"debug"}},
+        {"level":"warn", "data":{"test":"warn"}},
+        {"level":"trace", "data":{"test":"trace"}}
+      ]);
+    });
+
     function testLogWriterRaw(level, obj, tag, done){
       Logger.configure({logLevel: 'trace'});
       log = Logger.createLogger();
