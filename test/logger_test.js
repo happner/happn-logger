@@ -47,21 +47,36 @@ describe('Logger', function() {
         logFileBackups: 10,
         logFileMaxSize: 20480,
         logFileNameAbsolute: true,
-        logWriter: Logger.config.logWriter, // dodge object
+        logWriter: Logger.config.logWriter, // refer to itself
+        rawLogWriter: Logger.config.rawLogWriter, // refer to itself
         logger: {
-          appenders: [{
-            layout: {
-              pattern: '[%[%5.5p%]] - %m',
-              type: 'pattern'
+          appenders: {
+            console: {  
+              type: "console",
+              layout: Logger.config.logLayout 
             },
-            makers: Logger.config.logger.appenders[0].makers, // dodge object
-            type: 'console'
-          }]
+            $$RAW: {
+              type: "console",
+              layout: {
+                 type: "messagePassThrough"
+              }
+            }
+          },
+          categories: {
+            default: { 
+              appenders: ['console'], 
+              level: Logger.config.logLevel 
+            },
+            $$RAW: {
+              appenders: ["$$RAW"],
+              level: "info"
+            }
+          }
         },
-        log: Logger.config.log // dodge function
+        log: Logger.config.log, // refer to itself
+        $$RAW: Logger.config.$$RAW // refer to itself
       })
     });
-
   });
 
   context('log functions', function(){
@@ -464,14 +479,19 @@ describe('Logger', function() {
         logMessageDelimiter: ' ',
         logTimeDelta: false,
         logger: {
-          appenders: [{
-            type: 'file',
-            filename: 'file.log',
-            layout: {
-              type: 'pattern',
-              pattern: '--- %m ---'
+          appenders: { 
+            file: {
+              type: 'file',
+              filename: 'file.log',
+              layout: {
+                type: 'pattern',
+                pattern: '--- %m ---'
+              }
             }
-          }]
+          },
+          categories: {
+              default: { appenders: ['file'], level: 'all' }
+          }
         }
       });
 
@@ -484,10 +504,7 @@ describe('Logger', function() {
         fs.unlinkSync('file.log');
         done();
       }, 100);
-
-
     });
-
   });
 
   context('logger after event', function() {
@@ -529,4 +546,119 @@ describe('Logger', function() {
 
   });
 
+  context('raw object logging functions', function(){
+    it('defines a function to emit a log message at each level for raw logs', function() {
+      Logger.configure({logLevel: 'debug'});
+      var log = Logger.createLogger();
+      log.json.fatal   .should.be.an.instanceof(Function);
+      log.json.error   .should.be.an.instanceof(Function);
+      log.json.warn    .should.be.an.instanceof(Function);
+      log.json.info    .should.be.an.instanceof(Function);
+      log.json.debug   .should.be.an.instanceof(Function);
+      log.json.trace   .should.be.an.instanceof(Function);
+    });
+
+    it('calls the log raw function - fatal', function(done) {
+      testLogWriterRaw('fatal', { test: 'data'}, 'tag-1', done);
+    });
+
+    it('calls the log raw function - info', function(done) {
+      testLogWriterRaw('info', { test: 'data'}, 'tag-2', done);
+    });
+
+    it('calls the log raw function - error', function(done) {
+      testLogWriterRaw('error', { test: 'data'}, 'tag-3', done);
+    });
+
+    it('calls the log raw function - debug', function(done) {
+      testLogWriterRaw('debug', { test: 'data'}, 'tag-4', done);
+    });
+
+    it('calls the log raw function - warn', function(done) {
+      testLogWriterRaw('warn', { test: 'data'}, 'tag-5', done);
+    });
+
+    it('calls the log raw function - trace', function(done) {
+      testLogWriterRaw('trace', { test: 'data'}, 'tag-6', done);
+    });
+
+    it('calls the log raw functions', function() {
+      Logger.configure({logLevel: 'trace'});
+      log = Logger.createLogger();
+      const CaptureStdout = require('capture-stdout');
+      const captureStdout = new CaptureStdout();
+      captureStdout.startCapture();
+      log.json['fatal']({ test: 'fatal' });
+      log.json['info']({ test: 'info' });
+      log.json['error']({ test: 'error' });
+      log.json['debug']({ test: 'debug' });
+      log.json['warn']({ test: 'warn' });
+      log.json['trace']({ test: 'trace' });
+      captureStdout.stopCapture();
+      const arrJson = captureStdout
+        .getCapturedText()
+        .map(JSON.parse)
+        .map(item => {
+          delete item.timestamp;
+          return item;
+        });
+      arrJson.should.eql([
+        {"level":"fatal", "data":{"test":"fatal"}},
+        {"level":"info", "data":{"test":"info"}},
+        {"level":"error", "data":{"test":"error"}},
+        {"level":"debug", "data":{"test":"debug"}},
+        {"level":"warn", "data":{"test":"warn"}},
+        {"level":"trace", "data":{"test":"trace"}}
+      ]);
+    });
+
+    it('calls the log raw functions - non-objects', function() {
+      Logger.configure({logLevel: 'trace'});
+      log = Logger.createLogger();
+      const CaptureStdout = require('capture-stdout');
+      const captureStdout = new CaptureStdout();
+      captureStdout.startCapture();
+      log.json['fatal'](new Error('a fatal error!'));
+      log.json['info'](null);
+      log.json['error'](undefined);
+      log.json['debug'](12345);
+      log.json['warn']('warning!');
+      const circularObj = {};
+      circularObj.me = circularObj;
+      log.json['trace'](circularObj);
+      captureStdout.stopCapture();
+      const arrJson = captureStdout
+        .getCapturedText()
+        .map(JSON.parse)
+        .map(item => {
+          delete item.timestamp;
+          return item;
+        });
+      arrJson.should.eql([
+        {"level":"fatal","data": "Error: a fatal error!"},
+        {"level":"info","data":"[null]"},
+        {"level":"error","data":"[null]"},
+        {"level":"debug","data":12345},
+        {"level":"warn","data":'warning!'},
+        {"level":"trace","data":'not stringifyable: [object Object]'}
+      ]);
+    });
+
+    function testLogWriterRaw(level, obj, tag, done){
+      Logger.configure({logLevel: 'trace'});
+      log = Logger.createLogger();
+      Logger.config.rawLogWriter[level] = function(stringifiedObj) {
+        const parsed = JSON.parse(stringifiedObj);
+        parsed.timestamp.should.be.greaterThan(0);
+        delete parsed.timestamp;
+        parsed.should.eql({
+          data: obj,
+          level,
+          tag
+        });
+        done();
+      }
+      log.json[level](obj, tag);
+    }
+  });
 });
